@@ -142,7 +142,7 @@ local function updateHostStatus(username, jobId, playerCount, serverStatus, stat
 
     local response = requestFunction({
         Url = url,
-        Method = "PUT",
+        Method = "PUT",  -- เปลี่ยนเป็น PUT หาก API ต้องการ
         Headers = { ["Content-Type"] = "application/json" },
         Body = HttpService:JSONEncode(hostData)
     })
