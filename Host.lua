@@ -26,7 +26,7 @@ local function isHost2(username)
 end
 
 local function saveJobId(jobId)
-    print("Host 1 บันทึก jobId: ", jobId)  -- เพิ่ม log
+    print("Host 1 บันทึก jobId: ", jobId)
     local response = requestFunction({
         Url = savedJobIdUrl,
         Method = "PUT",
@@ -41,13 +41,12 @@ local function saveJobId(jobId)
     end
 end
 
-
 local function getSavedJobId()
     local response = game:HttpGet(savedJobIdUrl)
     if response then
         local data = HttpService:JSONDecode(response)
         if data and data.jobid then
-            print("Host 2 ดึง jobId สำเร็จ: " .. data.jobid)  -- เพิ่ม log
+            print("Host 2 ดึง jobId สำเร็จ: " .. data.jobid)
             return data.jobid
         else
             warn("ข้อมูลที่ได้รับไม่มี jobid หรือเป็นค่าว่าง")
@@ -57,11 +56,7 @@ local function getSavedJobId()
     end
     return nil
 end
-    if savedJobId then
-        print("Host 2 ดึง jobId สำเร็จ: " .. savedJobId)
-    else
-        warn("Host 2 ไม่สามารถดึง jobId ได้หรือ jobId เป็นค่าว่าง")
-    end
+
 local function CheckMoonAndTimeForSea3()
     local function MoonTextureId()
         return game:GetService("Lighting").Sky.MoonTextureId
@@ -112,7 +107,6 @@ local function fetchBestServer()
             local leastPlayers = math.huge
 
             for _, serverData in pairs(data) do
-                -- แปลงค่าที่จำเป็นจาก string เป็นตัวเลข
                 local playerCount = tonumber(serverData.player_count)
                 local timeTillFullMoon = tonumber(serverData.time_till_full_moon:match("^[%d%.]+"))
 
@@ -150,7 +144,7 @@ local function updateHostStatus(username, jobId, playerCount, serverStatus, stat
 
     local response = requestFunction({
         Url = url,
-        Method = "PUT",  -- เปลี่ยนเป็น PUT หาก API ต้องการ
+        Method = "PUT",
         Headers = { ["Content-Type"] = "application/json" },
         Body = HttpService:JSONEncode(hostData)
     })
@@ -162,86 +156,34 @@ local function updateHostStatus(username, jobId, playerCount, serverStatus, stat
     end
 end
 
-local function teleportToBestServer()
-    local playerName = Players.LocalPlayer.Name
-    local bestServer = fetchBestServer()
-
-    local currentServerStatus = CheckMoonAndTimeForSea3()
-
-    print("Current Moon Status: ", currentServerStatus)
-
-    if (currentServerStatus:find("Will Full Moon In") and currentServerStatus:find("%d+") and tonumber(currentServerStatus:match("%d+")) < 10) or
-       (currentServerStatus:find("Will End Moon In") and currentServerStatus:find("%d+") and tonumber(currentServerStatus:match("%d+")) > 2) then
-        print("เซิร์ฟเวอร์ปัจจุบันมีเวลาที่เหมาะสมสำหรับ Full Moon, หยุดการหาเซิร์ฟเวอร์ใหม่...")
-        updateHostStatus(playerName, game.JobId, #Players:GetPlayers(), currentServerStatus, "Connected")
-        return
-    else
-        print("ไม่ตรงกับเงื่อนไข Full Moon")
-    end
-
-    if bestServer then
-        local jobId = bestServer.jobid
-        local playerCount = bestServer.player_count
-        local serverStatus = bestServer.serverStatus or "Unknown"
-        local statusForClient = "Connected"
-
-        updateHostStatus(playerName, jobId, playerCount, serverStatus, statusForClient)
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, Players.LocalPlayer)
-    else
-        print("ไม่พบเซิร์ฟเวอร์ที่เหมาะสม")
-    end
-end
-
-
-
-local function checkHost2Status()
-    local savedJobId = getSavedJobId()
-    local currentJobId = game.JobId
-
-    if isHost2(Players.LocalPlayer.Name) then
-        if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
-            print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือก... jobId: " .. savedJobId)
-            TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
-        else
-            print("Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว หรือ jobId เป็นค่าว่าง หรือ Host 1 ยังไม่บันทึก jobId")
-        end
-    end
-end
 local function manageServerEntry()
     local username = Players.LocalPlayer.Name
     local currentJobId = game.JobId
 
     if isHost1(username) then
-        -- Host 1: เลือกเซิร์ฟเวอร์ที่ดีที่สุดและบันทึก jobId
         local bestServer = fetchBestServer()
         if bestServer then
             local jobId = bestServer.jobid
-            saveJobId(jobId)  -- บันทึก jobId ใน API เพื่อให้ Host 2 ใช้
+            saveJobId(jobId)
             updateHostStatus(_G.Host.Host1[1], jobId, #Players:GetPlayers(), CheckMoonAndTimeForSea3(), "Connected")
             TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, Players.LocalPlayer)
         else
             print("ไม่พบเซิร์ฟเวอร์ที่เหมาะสมสำหรับ Host 1")
         end
     elseif isHost2(username) then
-        -- Host 2: รอ jobId ที่ Host 1 บันทึก
         local savedJobId = getSavedJobId()
         
         if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
-            -- Host 2 ย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือกไว้
             print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือกไว้ด้วย jobId: " .. savedJobId)
             updateHostStatus(_G.Host.Host2[1], savedJobId, #Players:GetPlayers(), CheckMoonAndTimeForSea3(), "Connected")
             TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
         else
-            -- Host 2 รอการอัปเดตจาก Host 1
             print("Host 2 กำลังรอให้ Host 1 บันทึก jobId...")
         end
     end
 end
 
-manageServerEntry()
-
 while true do
     manageServerEntry()
-    checkHost2Status()
     wait(10)
 end
