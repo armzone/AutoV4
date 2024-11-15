@@ -222,10 +222,10 @@ local function checkHost2Status()
 
     if isHost2(Players.LocalPlayer.Name) then
         if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
-            print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือก...")
+            print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือก... jobId: " .. savedJobId)
             TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
         else
-            print("Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว หรือ jobId ว่าง")
+            print("Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว หรือ jobId เป็นค่าว่าง หรือ Host 1 ยังไม่บันทึก jobId")
         end
     end
 end
