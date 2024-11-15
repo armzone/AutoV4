@@ -55,6 +55,11 @@ local function getSavedJobId()
     end
     return nil
 end
+    if savedJobId then
+        print("Host 2 ดึง jobId สำเร็จ: " .. savedJobId)
+    else
+        warn("Host 2 ไม่สามารถดึง jobId ได้หรือ jobId เป็นค่าว่าง")
+    end
 local function CheckMoonAndTimeForSea3()
     local function MoonTextureId()
         return game:GetService("Lighting").Sky.MoonTextureId
@@ -200,7 +205,7 @@ local function manageServerEntry()
         end
     elseif isHost2(username) then
         local savedJobId = getSavedJobId()
-        if savedJobId and savedJobId ~= currentJobId then
+        if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
             print("ย้ายไปยังเซิร์ฟเวอร์ที่ Host1 ได้เลือกไว้แล้ว")
             TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
         else
@@ -214,11 +219,11 @@ local function checkHost2Status()
     local currentJobId = game.JobId
 
     if isHost2(Players.LocalPlayer.Name) then
-        if savedJobId and savedJobId ~= currentJobId then
+        if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
             print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือก...")
             TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
         else
-            print("Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว")
+            print("Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว หรือ jobId ว่าง")
         end
     end
 end
