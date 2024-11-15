@@ -28,9 +28,9 @@ end
 local function saveJobId(jobId)
     local response = requestFunction({
         Url = savedJobIdUrl,
-        Method = "POST",
+        Method = "PUT", -- เปลี่ยนจาก POST เป็น PUT
         Headers = { ["Content-Type"] = "application/json" },
-        Body = HttpService:JSONEncode({ jobId = jobId })
+        Body = HttpService:JSONEncode({ jobid = jobId })
     })
 
     if response.StatusCode == 200 then
