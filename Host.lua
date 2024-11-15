@@ -103,8 +103,10 @@ local function fetchBestServer()
 
             for _, serverData in pairs(data) do
                 local playerCount = tonumber(serverData.player_count)
-                if playerCount and playerCount < leastPlayers then
-                    if tonumber(serverData.time_till_full_moon) <= 10 then
+                local timeTillFullMoon = tonumber(serverData.time_till_full_moon)  -- เพิ่มการแปลงเป็นตัวเลข
+
+                if playerCount and timeTillFullMoon and playerCount < leastPlayers then
+                    if timeTillFullMoon <= 10 then
                         leastPlayers = playerCount
                         bestServer = serverData
                     end
