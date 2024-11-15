@@ -26,9 +26,10 @@ local function isHost2(username)
 end
 
 local function saveJobId(jobId)
+    print("Host 1 บันทึก jobId: ", jobId)  -- เพิ่ม log
     local response = requestFunction({
         Url = savedJobIdUrl,
-        Method = "PUT", -- เปลี่ยนจาก POST เป็น PUT
+        Method = "PUT",
         Headers = { ["Content-Type"] = "application/json" },
         Body = HttpService:JSONEncode({ jobid = jobId })
     })
@@ -40,12 +41,13 @@ local function saveJobId(jobId)
     end
 end
 
+
 local function getSavedJobId()
     local response = game:HttpGet(savedJobIdUrl)
     if response then
         local data = HttpService:JSONDecode(response)
         if data and data.jobId then
-            print("ดึง JobId สำเร็จ: " .. data.jobId)
+            print("Host 2 ดึง jobId: " .. data.jobId)  -- เพิ่ม log
             return data.jobId
         end
     else
@@ -53,7 +55,6 @@ local function getSavedJobId()
     end
     return nil
 end
-
 local function CheckMoonAndTimeForSea3()
     local function MoonTextureId()
         return game:GetService("Lighting").Sky.MoonTextureId
