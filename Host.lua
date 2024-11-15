@@ -96,7 +96,7 @@ end
 local function fetchBestServer()
     local response = game:HttpGet(apiUrl)
     if response then
-        print("ได้รับการตอบกลับจาก API:", response)
+        print("ข้อมูลที่ได้รับจาก API:", response)
         local data = HttpService:JSONDecode(response)
         if data then
             print("ข้อมูลที่ได้รับจาก API:", HttpService:JSONEncode(data))
@@ -104,16 +104,19 @@ local function fetchBestServer()
             local leastPlayers = math.huge
 
             for _, serverData in pairs(data) do
-                print("ตรวจสอบเซิร์ฟเวอร์:", HttpService:JSONEncode(serverData))
-
                 -- แปลงค่าที่จำเป็นจาก string เป็นตัวเลข
                 local playerCount = tonumber(serverData.player_count)
                 local timeTillFullMoon = tonumber(serverData.time_till_full_moon:match("^[%d%.]+"))
 
-                if playerCount and timeTillFullMoon and playerCount < leastPlayers then
-                    if timeTillFullMoon <= 10 then
+                print("ตรวจสอบเซิร์ฟเวอร์:", serverData.jobid)
+                print("playerCount:", playerCount)
+                print("timeTillFullMoon:", timeTillFullMoon)
+
+                if playerCount and timeTillFullMoon then
+                    if playerCount < leastPlayers and timeTillFullMoon <= 10 then
                         leastPlayers = playerCount
                         bestServer = serverData
+                        print("พบเซิร์ฟเวอร์ที่ตรงเงื่อนไข: ", HttpService:JSONEncode(bestServer))
                     end
                 end
             end
