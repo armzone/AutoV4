@@ -210,17 +210,23 @@ local function manageServerEntry()
     elseif isHost2(username) then
         -- ส่วนของ Host 2 รอ jobId ที่บันทึกโดย Host 1
         local savedJobId = getSavedJobId()
-        if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
-            -- Host 2 เข้าร่วมเซิร์ฟเวอร์ที่ Host 1 เลือกไว้
-            print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือกไว้ด้วย jobId: " .. savedJobId)
-            updateHostStatus(_G.Host.Host2[1], savedJobId, #Players:GetPlayers(), CheckMoonAndTimeForSea3(), "Connected")
-            TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
+        
+        -- ตรวจสอบว่าถ้า Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว จะไม่ย้ายเซิร์ฟเวอร์
+        if savedJobId and savedJobId ~= "" then
+            if savedJobId == currentJobId then
+                print("Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว ไม่จำเป็นต้องย้ายเซิร์ฟเวอร์")
+                updateHostStatus(_G.Host.Host2[1], savedJobId, #Players:GetPlayers(), CheckMoonAndTimeForSea3(), "Connected")
+            else
+                print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือกไว้ด้วย jobId: " .. savedJobId)
+                updateHostStatus(_G.Host.Host2[1], savedJobId, #Players:GetPlayers(), CheckMoonAndTimeForSea3(), "Connected")
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
+            end
         else
-            -- Host 2 รอการอัปเดตจาก Host 1
             print("Host 2 กำลังรอให้ Host 1 บันทึก jobId...")
         end
     end
 end
+
 
 local function checkHost2Status()
     local savedJobId = getSavedJobId()
