@@ -161,6 +161,17 @@ local function manageServerEntry()
     local currentJobId = game.JobId
 
     if isHost1(username) then
+        -- ตรวจสอบสถานะเซิร์ฟเวอร์ปัจจุบันก่อนเลือกเซิร์ฟเวอร์ใหม่
+        local currentServerStatus = CheckMoonAndTimeForSea3()
+        print("Host 1: Current Server Status -", currentServerStatus)
+
+        if currentServerStatus:find("Will Full Moon In") and tonumber(currentServerStatus:match("%d+")) and tonumber(currentServerStatus:match("%d+")) < 10 then
+            print("Host 1: เซิร์ฟเวอร์ปัจจุบันเหมาะสมสำหรับ Full Moon หยุดการเลือกเซิร์ฟเวอร์ใหม่")
+            updateHostStatus(_G.Host.Host1[1], currentJobId, #Players:GetPlayers(), currentServerStatus, "Connected")
+            return
+        end
+
+        -- ค้นหาเซิร์ฟเวอร์ใหม่หากไม่ตรงเงื่อนไข
         local bestServer = fetchBestServer()
         if bestServer then
             local jobId = bestServer.jobid
@@ -171,8 +182,8 @@ local function manageServerEntry()
             print("ไม่พบเซิร์ฟเวอร์ที่เหมาะสมสำหรับ Host 1")
         end
     elseif isHost2(username) then
+        -- Host 2: รอ jobId ที่ Host 1 บันทึก
         local savedJobId = getSavedJobId()
-        
         if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
             print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือกไว้ด้วย jobId: " .. savedJobId)
             updateHostStatus(_G.Host.Host2[1], savedJobId, #Players:GetPlayers(), CheckMoonAndTimeForSea3(), "Connected")
@@ -182,6 +193,7 @@ local function manageServerEntry()
         end
     end
 end
+
 
 while true do
     manageServerEntry()
