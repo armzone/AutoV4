@@ -197,18 +197,24 @@ local function manageServerEntry()
     local currentJobId = game.JobId
 
     if isHost1(username) then
+        -- ส่วนของ Host 1
         local bestServer = fetchBestServer()
         if bestServer then
             local jobId = bestServer.jobid
             saveJobId(jobId)
+            -- อัปเดตสถานะ Host 1 ใน API
+            updateHostStatus(_G.Host.Host1[1], jobId, #Players:GetPlayers(), CheckMoonAndTimeForSea3(), "Connected")
             teleportToBestServer()
         else
             print("ไม่พบเซิร์ฟเวอร์ที่เหมาะสมสำหรับ Host 1")
         end
     elseif isHost2(username) then
+        -- ส่วนของ Host 2
         local savedJobId = getSavedJobId()
         if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
             print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือกไว้ด้วย jobId: " .. savedJobId)
+            -- อัปเดตสถานะ Host 2 ใน API
+            updateHostStatus(_G.Host.Host2[1], savedJobId, #Players:GetPlayers(), CheckMoonAndTimeForSea3(), "Connected")
             TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
         else
             print("ไม่มี JobId ที่บันทึกไว้ หรือ Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว หรือ jobId เป็นค่าว่าง")
