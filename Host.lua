@@ -194,7 +194,8 @@ local function manageServerEntry()
     end
 end
 
-
+print("รอ 30 วินาทีก่อนเริ่มการทำงาน...")
+wait(30)
 while true do
     manageServerEntry()
     wait(10)
