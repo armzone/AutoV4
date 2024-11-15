@@ -46,9 +46,11 @@ local function getSavedJobId()
     local response = game:HttpGet(savedJobIdUrl)
     if response then
         local data = HttpService:JSONDecode(response)
-        if data and data.jobId then
-            print("Host 2 ดึง jobId: " .. data.jobId)  -- เพิ่ม log
-            return data.jobId
+        if data and data.jobid then
+            print("Host 2 ดึง jobId สำเร็จ: " .. data.jobid)  -- เพิ่ม log
+            return data.jobid
+        else
+            warn("ข้อมูลที่ได้รับไม่มี jobid หรือเป็นค่าว่าง")
         end
     else
         warn("ไม่สามารถดึงข้อมูล JobId ได้")
@@ -206,10 +208,10 @@ local function manageServerEntry()
     elseif isHost2(username) then
         local savedJobId = getSavedJobId()
         if savedJobId and savedJobId ~= "" and savedJobId ~= currentJobId then
-            print("ย้ายไปยังเซิร์ฟเวอร์ที่ Host1 ได้เลือกไว้แล้ว")
+            print("Host 2 กำลังย้ายไปยังเซิร์ฟเวอร์ที่ Host 1 เลือกไว้ด้วย jobId: " .. savedJobId)
             TeleportService:TeleportToPlaceInstance(game.PlaceId, savedJobId, Players.LocalPlayer)
         else
-            print("ไม่มี JobId ที่บันทึกไว้ หรือ Host 2 อยู่ในเซิร์ฟเวอร์เดียวกันแล้ว")
+            print("ไม่มี JobId ที่บันทึกไว้ หรือ Host 2 อยู่ในเซิร์ฟเวอร์เดียวกับ Host 1 แล้ว หรือ jobId เป็นค่าว่าง")
         end
     end
 end
