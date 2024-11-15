@@ -122,6 +122,7 @@ local function fetchBestServer()
 end
 
 
+
 local function updateHostStatus(username, jobId, playerCount, serverStatus, statusForClient)
     local url = putUrlBase .. HttpService:UrlEncode(username)
     local hostData = {
