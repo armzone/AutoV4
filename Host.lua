@@ -1,10 +1,3 @@
-_G.Group = "Arm2"
-
-_G.Host = {
-    Host1 = { "armkung285" },
-    Host2 = { "eavbqqk824" }
-}
-
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
