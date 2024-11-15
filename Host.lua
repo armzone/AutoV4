@@ -102,8 +102,9 @@ local function fetchBestServer()
             local leastPlayers = math.huge
 
             for _, serverData in pairs(data) do
+                print("ตรวจสอบเซิร์ฟเวอร์:", HttpService:JSONEncode(serverData))  -- เพิ่มการพิมพ์ข้อมูลที่ได้รับ
                 local playerCount = tonumber(serverData.player_count)
-                local timeTillFullMoon = tonumber(serverData.time_till_full_moon)  -- เพิ่มการแปลงเป็นตัวเลข
+                local timeTillFullMoon = tonumber(serverData.time_till_full_moon)  -- แปลงเป็นตัวเลข
 
                 if playerCount and timeTillFullMoon and playerCount < leastPlayers then
                     if timeTillFullMoon <= 10 then
@@ -119,6 +120,7 @@ local function fetchBestServer()
     end
     return nil
 end
+
 
 local function updateHostStatus(username, jobId, playerCount, serverStatus, statusForClient)
     local url = putUrlBase .. HttpService:UrlEncode(username)
