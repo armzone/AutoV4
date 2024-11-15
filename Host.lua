@@ -96,15 +96,17 @@ end
 local function fetchBestServer()
     local response = game:HttpGet(apiUrl)
     if response then
+        print("ได้รับการตอบกลับจาก API:", response)  -- แสดงข้อมูล API ตอบกลับ
         local data = HttpService:JSONDecode(response)
         if data then
+            print("ข้อมูลที่ได้รับจาก API:", HttpService:JSONEncode(data))  -- แสดงข้อมูลทั้งหมดจาก API
             local bestServer = nil
             local leastPlayers = math.huge
 
             for _, serverData in pairs(data) do
-                print("ตรวจสอบเซิร์ฟเวอร์:", HttpService:JSONEncode(serverData))  -- เพิ่มการพิมพ์ข้อมูลที่ได้รับ
+                print("ตรวจสอบเซิร์ฟเวอร์:", HttpService:JSONEncode(serverData))  -- ตรวจสอบเซิร์ฟเวอร์ทีละตัว
                 local playerCount = tonumber(serverData.player_count)
-                local timeTillFullMoon = tonumber(serverData.time_till_full_moon)  -- แปลงเป็นตัวเลข
+                local timeTillFullMoon = tonumber(serverData.time_till_full_moon)
 
                 if playerCount and timeTillFullMoon and playerCount < leastPlayers then
                     if timeTillFullMoon <= 10 then
@@ -114,14 +116,14 @@ local function fetchBestServer()
                 end
             end
             return bestServer
+        else
+            warn("ไม่สามารถแปลงข้อมูล JSON ได้")
         end
     else
-        warn("ไม่สามารถดึงข้อมูลจาก API ได้")
+        warn("ไม่สามารถเชื่อมต่อกับ API ได้")
     end
     return nil
 end
-
-
 
 local function updateHostStatus(username, jobId, playerCount, serverStatus, statusForClient)
     local url = putUrlBase .. HttpService:UrlEncode(username)
