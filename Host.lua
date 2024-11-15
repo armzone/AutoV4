@@ -4,7 +4,7 @@ local HttpService = game:GetService("HttpService")
 local requestFunction = http_request or request or HttpPost or syn.request
 
 local savedJobIdUrl = "http://223.206.145.158:5000/" .. _G.Group .. "/savedJobId"
-local putUrlBase = "http://223.206.145.158:5000/" .. _G.Group .. "/HostStatus/"
+local putUrlBase = "http://223.206.145.158:5000/" .. _G.Group .. "/HostStatus"
 local apiUrl = "http://223.206.145.158:5000/Fullmoon"
 
 local function isHost1(username)
