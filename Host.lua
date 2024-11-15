@@ -165,7 +165,11 @@ local function manageServerEntry()
         local currentServerStatus = CheckMoonAndTimeForSea3()
         print("Host 1: Current Server Status -", currentServerStatus)
 
-        if currentServerStatus:find("Will Full Moon In") and tonumber(currentServerStatus:match("%d+")) and tonumber(currentServerStatus:match("%d+")) < 10 then
+        -- เงื่อนไขสำหรับเซิร์ฟเวอร์ที่เหมาะสม
+        local willFullMoonIn = tonumber(currentServerStatus:match("Will Full Moon In (%d+)"))
+        local willEndMoonIn = tonumber(currentServerStatus:match("Will End Moon In (%d+)"))
+
+        if (willFullMoonIn and willFullMoonIn < 10) or (willEndMoonIn and willEndMoonIn > 2) then
             print("Host 1: เซิร์ฟเวอร์ปัจจุบันเหมาะสมสำหรับ Full Moon หยุดการเลือกเซิร์ฟเวอร์ใหม่")
             updateHostStatus(_G.Host.Host1[1], currentJobId, #Players:GetPlayers(), currentServerStatus, "Connected")
             return
@@ -193,6 +197,7 @@ local function manageServerEntry()
         end
     end
 end
+
 
 print("รอ 30 วินาทีก่อนเริ่มการทำงาน...")
 wait(30)
