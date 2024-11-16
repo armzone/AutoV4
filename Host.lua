@@ -68,6 +68,7 @@ local function CheckMoonAndTimeForSea3()
             ["http://www.roblox.com/asset/?id=9709150086"] = "Bad Moon",
             ["http://www.roblox.com/asset/?id=9709149680"] = "Bad Moon",
             ["http://www.roblox.com/asset/?id=9709149431"] = "Full Moon",
+            ["http://www.roblox.com/asset/?id=15493317929"] = "Full Moon",
             ["http://www.roblox.com/asset/?id=9709149052"] = "Next Night",
             ["http://www.roblox.com/asset/?id=9709143733"] = "Bad Moon",
             ["http://www.roblox.com/asset/?id=9709139597"] = "Bad Moon",
