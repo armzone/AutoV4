@@ -3,9 +3,9 @@ local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 local requestFunction = http_request or request or HttpPost or syn.request
 
-local savedJobIdUrl = "http://223.205.201.218:5000/" .. _G.Group .. "/savedJobId"
-local putUrlBase = "http://223.205.201.218:5000/" .. _G.Group .. "/HostStatus/"
-local apiUrl = "http://223.205.201.218:5000/Fullmoon"
+local savedJobIdUrl = "http://223.205.211.207:5000/" .. _G.Group .. "/savedJobId"
+local putUrlBase = "http://223.205.211.207:5000/" .. _G.Group .. "/HostStatus/"
+local apiUrl = "http://223.205.211.207:5000/Fullmoon"
 
 local function isHost1(username)
     for _, name in ipairs(_G.Host.Host1) do
