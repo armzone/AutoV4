@@ -4,7 +4,7 @@ local HttpService = game:GetService("HttpService")
 local StarterGui = game:GetService("StarterGui")
 
 -- URL ของ Firebase ที่เก็บข้อมูลล่าสุดจาก _latest_messages
-local serverUrl = "http://223.205.211.207:5000/Fullmoon"
+local serverUrl = "http://223.205.86.150:5000/Fullmoon"
 
 -- ฟังก์ชันสำหรับการดึงข้อมูลจาก Firebase
 local function getLatestMessagesFromFirebase(url)
