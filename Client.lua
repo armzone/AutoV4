@@ -6,8 +6,22 @@ local requestFunction = http_request or request or HttpPost or syn.request
 local savedJobIdUrl = "http://223.205.86.150:5000/" .. _G.Group .. "/savedJobId"
 local hostStatusUrl = "http://223.205.86.150:5000/" .. _G.Group .. "/HostStatus/"
 
+-- ฟังก์ชันสำหรับการเรียก HTTP อย่างปลอดภัย
+local function safeHttpGet(url)
+    local success, response = pcall(function()
+        return game:HttpGet(url)
+    end)
+    if success then
+        return response
+    else
+        print("HTTP Error: ", response) -- แสดงข้อความข้อผิดพลาด
+        wait(5) -- รอ 5 วินาทีก่อนลองใหม่
+        return nil
+    end
+end
+
 local function getSavedJobId()
-    local response = game:HttpGet(savedJobIdUrl)
+    local response = safeHttpGet(savedJobIdUrl)
     if response then
         local data = HttpService:JSONDecode(response)
         if data and data.jobid then
@@ -19,7 +33,14 @@ end
 
 local function CheckAcientOneStatus()
     local v227, v228, v229 = nil, nil, nil
-    v229, v228, v227 = game.ReplicatedStorage.Remotes.CommF_:InvokeServer("UpgradeRace", "Check")
+    local success, err = pcall(function()
+        v229, v228, v227 = game.ReplicatedStorage.Remotes.CommF_:InvokeServer("UpgradeRace", "Check")
+    end)
+    if not success then
+        print("Error invoking server: ", err)
+        wait(5) -- รอ 5 วินาทีก่อนลองใหม่
+        return nil, "Error"
+    end
 
     local trainingSessions = v228
     local upgradeStatus
@@ -43,8 +64,12 @@ end
 local function teleportToHost()
     local hostJobId = getSavedJobId()
     if hostJobId then
-        print("ย้ายไปยังเซิร์ฟเวอร์ของ Host")
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, hostJobId, Players.LocalPlayer)
+        if hostJobId ~= game.JobId then
+            print("ย้ายไปยังเซิร์ฟเวอร์ของ Host")
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, hostJobId, Players.LocalPlayer)
+        else
+            print("คุณอยู่ในเซิร์ฟเวอร์เดียวกับ Host แล้ว")
+        end
     else
         print("ไม่พบ JobId ของ Host ในเซิร์ฟเวอร์")
     end
@@ -62,30 +87,52 @@ local function TeleportToThirdServer()
 
     local function ListServers(cursor)
         local url = ApiUrl .. ((cursor and "&cursor="..cursor) or "")
-        local response = game:HttpGet(url)
-        return HttpService:JSONDecode(response)
+        local response = safeHttpGet(url)
+        if response then
+            return HttpService:JSONDecode(response)
+        else
+            return nil
+        end
     end
 
     local player = Players.LocalPlayer
     local Servers, Server, Next
+    local retryCount = 0
+    local maxRetries = 5 -- กำหนดจำนวนครั้งสูงสุด
 
     repeat
         Servers = ListServers(Next)
-        Server = Servers.data[3]  -- เลือกเซิร์ฟเวอร์ที่ 3
-        Next = Servers.nextPageCursor
-    until Server
+        if Servers and Servers.data then
+            Server = Servers.data[3] -- เลือกเซิร์ฟเวอร์ที่ 3
+            Next = Servers.nextPageCursor
+        else
+            Server = nil
+        end
+
+        retryCount = retryCount + 1
+        if not Server and retryCount < maxRetries then
+            print("Retrying... Attempt", retryCount)
+            wait(5) -- รอ 5 วินาทีก่อนลองใหม่
+        end
+    until Server or retryCount >= maxRetries
 
     if Server then
-        wait(5) -- รอ 5 วินาทีก่อนเทเลพอร์ต
+        print("Teleporting to third server...")
         TeleportService:TeleportToPlaceInstance(PlaceId, Server.id, player)
     else
-        warn("Server not found.")
+        warn("Unable to find a suitable server. Attempting random server.")
+        TeleportService:Teleport(PlaceId) -- ย้ายไปเซิร์ฟเวอร์สุ่ม
     end
 end
+
 
 local function checkAndTeleport()
     wait(30)
     local trainingSessions, upgradeStatus = CheckAcientOneStatus()
+    if upgradeStatus == "Error" then
+        return -- ข้ามการทำงานหากเกิดข้อผิดพลาด
+    end
+
     local hostJobId = getSavedJobId()
     local currentJobId = game.JobId
 
@@ -93,16 +140,13 @@ local function checkAndTeleport()
     print("Current JobId:", currentJobId)
 
     if currentJobId == hostJobId then
-        -- หากเงื่อนไขนี้เป็นจริง ผู้เล่นจะไม่ถูกย้ายไปเซิร์ฟเวอร์ที่ 3
         if upgradeStatus == "✅ Ready For Trial" or (trainingSessions == nil and upgradeStatus == "❓ You have yet to achieve greatness") then
             print("สถานะตรงเงื่อนไข หรือไม่ต้องย้ายเซิร์ฟเวอร์")
         else
-            -- เงื่อนไขนี้จะทำงานหากไม่ตรงกับสถานะข้างต้น
             print("สถานะไม่ตรงเงื่อนไขและอยู่ในเซิร์ฟเวอร์เดียวกับ Host, ย้ายไปเซิร์ฟเวอร์ที่ 3...")
             TeleportToThirdServer()
         end
     else
-        -- การตรวจสอบในกรณีที่ไม่อยู่ในเซิร์ฟเวอร์เดียวกับ Host
         if upgradeStatus == "✅ Ready For Trial" or (trainingSessions == nil and upgradeStatus == "❓ You have yet to achieve greatness") then
             print("สถานะตรงเงื่อนไข, เตรียมย้ายเซิร์ฟเวอร์ไปหา Host...")
             teleportToHost()
@@ -113,6 +157,12 @@ local function checkAndTeleport()
 end
 
 while true do
-    checkAndTeleport()
-    wait(10)
+    local success, err = pcall(function()
+        checkAndTeleport()
+    end)
+    if not success then
+        warn("Error in checkAndTeleport:", err)
+        wait(10) -- รอ 10 วินาทีก่อนลองใหม่
+    end
+    wait(30) -- หน่วงเวลาเพื่อลดการเรียก API บ่อยเกินไป
 end
