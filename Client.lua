@@ -98,7 +98,7 @@ local function TeleportToThirdServer()
     local player = Players.LocalPlayer
     local Servers, Server, Next
     local retryCount = 0
-    local maxRetries = 5 -- กำหนดจำนวนครั้งสูงสุด
+    local maxRetries = 10 -- กำหนดจำนวนครั้งสูงสุด
 
     repeat
         Servers = ListServers(Next)
