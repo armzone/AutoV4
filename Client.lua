@@ -3,8 +3,8 @@ local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 local requestFunction = http_request or request or HttpPost or syn.request
 
-local savedJobIdUrl = "http://223.205.86.150:5000/" .. _G.Group .. "/savedJobId"
-local hostStatusUrl = "http://223.205.86.150:5000/" .. _G.Group .. "/HostStatus/"
+local savedJobIdUrl = "http://223.206.67.125:5000/" .. _G.Group .. "/savedJobId"
+local hostStatusUrl = "http://223.206.67.125:5000/" .. _G.Group .. "/HostStatus/"
 
 -- ฟังก์ชันสำหรับการเรียก HTTP อย่างปลอดภัย
 local function safeHttpGet(url)
